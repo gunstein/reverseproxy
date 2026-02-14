@@ -1,0 +1,53 @@
+http:
+  # Routers: Match domain -> Entrypoint -> Service
+  routers:
+    pinball2d_router:
+      rule: "Host(`pinball2d.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: "pinball2d_service"
+      tls:
+        certResolver: "myresolver"
+      middlewares:
+        - "compress-middleware"
+
+    pinball3d_router:
+      rule: "Host(`pinball3d.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: "pinball3d_service"
+      tls:
+        certResolver: "myresolver"
+      middlewares:
+        - "compress-middleware"
+
+    mypage_router:
+      rule: "Host(`gunstein.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: "mypage_service"
+      tls:
+        certResolver: "myresolver"
+      middlewares:
+        - "compress-middleware"
+
+  # Services: Where does each router send traffic?
+  # (The container name from docker-compose, plus the internal port)
+  services:
+    pinball2d_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball2d:80"
+
+    pinball3d_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball3d:80"
+
+    mypage_service:
+      loadBalancer:
+        servers:
+          - url: "http://mypage_server:80"
+
+  # Middlewares, e.g. for compression
+  middlewares:
+    compress-middleware:
+      compress: {}
+

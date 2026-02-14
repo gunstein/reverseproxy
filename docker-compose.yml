@@ -1,0 +1,116 @@
+version: "3.8"
+
+networks:
+  web:
+    name: web
+
+services:
+  traefik:
+    image: docker.io/traefik:v3.3
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      # Logg (juster til DEBUG ved behov)
+      - --log.level=INFO
+      - --accesslog=true
+
+      # Entrypoints
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+
+      # Redirect http -> https
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.web.http.redirections.entryPoint.permanent=true
+
+      # ACME (Let's Encrypt) TLS-ALPN challenge
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.email=gunstein.vatnar@vatnar.no
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+
+      # File provider (dynamic config)
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+
+      # Dashboard/API: IKKE eksponer uten egen router + auth
+      - --api.dashboard=true
+      - --api.insecure=false
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./letsencrypt:/letsencrypt
+      - ./traefik-config:/etc/traefik/dynamic:ro
+
+    networks:
+      - web
+
+  # --- Eksisterende images (forutsetter at de lytter på 80 internt) ---
+  pinball2d:
+    image: docker.io/gunstein/pinball2d:latest
+    container_name: pinball2d
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - web
+
+  pinball3d:
+    image: docker.io/gunstein/pinball3d:latest
+    container_name: pinball3d
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - web
+
+  mypage_server:
+    image: docker.io/gunstein/mypage_server:latest
+    container_name: mypage_server
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - web
+
+  # --- Bygg fra repo ---
+  pinball_web:
+    container_name: pinball_web
+    build:
+      context: ../source/Pinball2DMulti/client
+      dockerfile: Containerfile
+    image: pinball_web:local
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - web
+
+  pinball_server:
+    container_name: pinball_server
+    build:
+      context: ../source/Pinball2DMulti
+      dockerfile: server/Containerfile
+    image: pinball_server:local
+    restart: unless-stopped
+    expose:
+      - "9001"
+    networks:
+      - web
+
+  pinball_bevy_web:
+    container_name: pinball_bevy_web
+    build:
+      context: ../source/Pinball2DMulti
+      dockerfile: client_bevy/Containerfile
+    image: pinball_bevy_web:local
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - web
+

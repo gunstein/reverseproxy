@@ -1,0 +1,77 @@
+http:
+  routers:
+    pinball2d_router:
+      rule: "Host(`pinball2d.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: "pinball2d_service"
+      tls:
+        certResolver: "myresolver"
+      middlewares:
+        - "compress-middleware"
+
+    pinball3d_router:
+      rule: "Host(`pinball3d.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: "pinball3d_service"
+      tls:
+        certResolver: "myresolver"
+      middlewares:
+        - "compress-middleware"
+
+    mypage_router:
+      rule: "Host(`gunstein.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: "mypage_service"
+      tls:
+        certResolver: "myresolver"
+      middlewares:
+        - "compress-middleware"
+
+    # --- NYTT: pinball.vatnar.no ---
+    pinball_router:
+      rule: "Host(`pinball.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: "pinball_web_service"
+      tls:
+        certResolver: "myresolver"
+      middlewares:
+        - "compress-middleware"
+
+    pinball_ws_router:
+      rule: "Host(`pinball.vatnar.no`) && PathPrefix(`/ws`)"
+      entryPoints: ["websecure"]
+      service: "pinball_ws_service"
+      tls:
+        certResolver: "myresolver"
+
+  services:
+    pinball2d_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball2d:80"
+
+    pinball3d_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball3d:80"
+
+    mypage_service:
+      loadBalancer:
+        servers:
+          - url: "http://mypage_server:80"
+
+    # --- NYTT: pinball.vatnar.no ---
+    pinball_web_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball_web:80"
+
+    pinball_ws_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball_server:9001"
+
+  middlewares:
+    compress-middleware:
+      compress: {}
+

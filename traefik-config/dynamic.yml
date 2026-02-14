@@ -1,0 +1,134 @@
+http:
+  routers:
+    pinball2d_router:
+      rule: "Host(`pinball2d.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: pinball2d_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["default-chain"]
+
+    pinball3d_router:
+      rule: "Host(`pinball3d.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: pinball3d_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["default-chain"]
+
+    mypage_router:
+      rule: "Host(`gunstein.vatnar.no`)"
+      entryPoints: ["websecure"]
+      service: mypage_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["default-chain"]
+
+    # pinball.vatnar.no (web)
+    pinball_router:
+      rule: "Host(`pinball.vatnar.no`) && !PathPrefix(`/ws`)"
+      priority: 10
+      entryPoints: ["websecure"]
+      service: pinball_web_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["default-chain"]
+
+    # pinball.vatnar.no (websocket)
+    pinball_ws_router:
+      rule: "Host(`pinball.vatnar.no`) && PathPrefix(`/ws`)"
+      priority: 20
+      entryPoints: ["websecure"]
+      service: pinball_ws_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["ws-protect-chain"]
+
+    # pinballbevy.vatnar.no (web)
+    pinball_bevy_router:
+      rule: "Host(`pinballbevy.vatnar.no`) && !PathPrefix(`/ws`)"
+      priority: 10
+      entryPoints: ["websecure"]
+      service: pinball_bevy_web_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["default-chain"]
+
+    # pinballbevy.vatnar.no (websocket) - same game server
+    pinball_bevy_ws_router:
+      rule: "Host(`pinballbevy.vatnar.no`) && PathPrefix(`/ws`)"
+      priority: 20
+      entryPoints: ["websecure"]
+      service: pinball_ws_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["ws-protect-chain"]
+
+  services:
+    pinball2d_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball2d:80"
+
+    pinball3d_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball3d:80"
+
+    mypage_service:
+      loadBalancer:
+        servers:
+          - url: "http://mypage_server:80"
+
+    pinball_web_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball_web:80"
+
+    pinball_bevy_web_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball_bevy_web:80"
+
+    pinball_ws_service:
+      loadBalancer:
+        servers:
+          - url: "http://pinball_server:9001"
+
+  middlewares:
+    # (ingen endringer i middlewares)
+    default-chain:
+      chain:
+        middlewares:
+          - compress-middleware
+          - security-headers
+
+    ws-protect-chain:
+      chain:
+        middlewares:
+          - compress-middleware
+          - ws-inflight
+          - ws-ratelimit
+
+    compress-middleware:
+      compress: {}
+
+    security-headers:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: "no-referrer"
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+
+    ws-inflight:
+      inFlightReq:
+        amount: 50
+
+    ws-ratelimit:
+      rateLimit:
+        average: 30
+        burst: 60
+
