@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="${ROOT_DIR}/../source"
 PINBALL_REPO_DIR="${SOURCE_DIR}/Pinball2DMulti"
 MYPAGE_REPO_DIR="${SOURCE_DIR}/mypage_server"
+PRUNE_CACHE="${1:-}"
 
 PINBALL_REPO_URL="https://github.com/gunstein/Pinball2DMulti"
 MYPAGE_REPO_URL="https://github.com/gunstein/mypage_server"
@@ -45,10 +46,12 @@ echo "==> Bygger tjenester"
 echo "==> Restarter tjenester"
 "${COMPOSE_CMD[@]}" up -d --force-recreate traefik mypage_server pinball_web pinball_bevy_web pinball_server
 
-echo "==> Rydder ubrukte images"
-podman image prune -f
-
 echo "==> Status"
 "${COMPOSE_CMD[@]}" ps
+
+if [ "${PRUNE_CACHE}" = "delete_podman_cache" ]; then
+  echo "==> Rydder ubrukte images"
+  podman image prune -f
+fi
 
 echo "==> Ferdig"
