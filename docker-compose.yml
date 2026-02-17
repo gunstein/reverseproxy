@@ -69,7 +69,10 @@ services:
       - web
 
   mypage_server:
-    image: docker.io/gunstein/mypage_server:latest
+    build:
+      context: ${MYPAGE_BUILD_CONTEXT:-../source/mypage_server}
+      dockerfile: ${MYPAGE_DOCKERFILE:-Dockerfile}
+    image: ${MYPAGE_IMAGE:-mypage_server:local}
     container_name: mypage_server
     restart: unless-stopped
     expose:
