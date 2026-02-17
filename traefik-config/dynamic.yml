@@ -115,7 +115,6 @@ http:
 
     security-headers:
       headers:
-        browserXssFilter: true
         contentTypeNosniff: true
         frameDeny: true
         referrerPolicy: "no-referrer"
@@ -129,11 +128,11 @@ http:
 
     pinball-csp:
       headers:
-        contentSecurityPolicy: "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss:; img-src 'self' data:; font-src 'self'"
+        contentSecurityPolicy: "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://pinball.vatnar.no; img-src 'self' data:; font-src 'self'"
 
     pinball-bevy-csp:
       headers:
-        contentSecurityPolicy: "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss:; img-src 'self' data:; font-src 'self'"
+        contentSecurityPolicy: "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://pinballbevy.vatnar.no; img-src 'self' data:; font-src 'self'"
 
     ws-inflight:
       inFlightReq:
