@@ -45,6 +45,9 @@ echo "==> Bygger tjenester"
 echo "==> Restarter tjenester"
 "${COMPOSE_CMD[@]}" up -d --force-recreate traefik mypage_server pinball_web pinball_bevy_web pinball_server
 
+echo "==> Rydder ubrukte images"
+podman image prune -f
+
 echo "==> Status"
 "${COMPOSE_CMD[@]}" ps
 
