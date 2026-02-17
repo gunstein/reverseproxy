@@ -117,6 +117,7 @@ http:
       headers:
         contentTypeNosniff: true
         frameDeny: true
+        permissionsPolicy: "accelerometer=(), autoplay=(), camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
         referrerPolicy: "no-referrer"
         stsSeconds: 31536000
         stsIncludeSubdomains: true
