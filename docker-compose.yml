@@ -100,6 +100,8 @@ services:
     restart: unless-stopped
     expose:
       - "9001"
+    environment:
+      - ALLOWED_ORIGINS=https://pinball.vatnar.no,https://pinballbevy.vatnar.no
     networks:
       - web
 
