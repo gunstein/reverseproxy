@@ -13,12 +13,12 @@ Internet (HTTP/HTTPS)
         │
    Docker network "web"
         │
-  ┌─────┼─────┬──────────┬──────────┬──────────────┐
-  │     │     │          │          │              │
-pinball pinball mypage  pinball   pinball       pinball
- 2d     3d    server    web      bevy_web      server
-                                              (WebSocket
-                                               :9001)
+  ┌─────┼─────┬──────────┬──────────┬──────────────┬──────────────┬──────────────┐
+  │     │     │          │          │              │              │              │
+pinball pinball mypage  pinball   pinball       pinball      blokkflyt     blokkflyt
+ 2d     3d    server    web      bevy_web      server          web           server
+                                              (WebSocket                  (WebSocket
+                                               :9001)                      :8000)
 ```
 
 ## Services & Domains
@@ -30,6 +30,7 @@ pinball pinball mypage  pinball   pinball       pinball
 | `pinball3d.vatnar.no` | pinball3d | Pinball 3D game |
 | `pinball.vatnar.no` | pinball_web + pinball_server | Multiplayer pinball (HTTP + WebSocket on `/ws`) |
 | `pinballbevy.vatnar.no` | pinball_bevy_web + pinball_server | Bevy engine pinball client (HTTP + WebSocket on `/ws`) |
+| `blokkflyt.vatnar.no` | blokkflyt_web + blokkflyt_server | Bitcoin block explorer (HTTP + API/WebSocket on `/ws`, `/snapshot`, `/stats`, `/health`) |
 
 ## Security & Middleware
 
@@ -42,6 +43,12 @@ pinball pinball mypage  pinball   pinball       pinball
 - Docker and Docker Compose
 - DNS A records for all subdomains pointing to the server
 - Source code at `../source/Pinball2DMulti/` (for `pinball_web`, `pinball_bevy_web`, and `pinball_server` which are built locally)
+- Source code at `../source/blokkflyt/` (for `blokkflyt_web` and `blokkflyt_server` which are built locally)
+- A `.env` file with Bitcoin RPC credentials (see `.env` — not committed to git):
+  ```
+  BITCOIN_RPC_USER=...
+  BITCOIN_RPC_PASSWORD=...
+  ```
 
 ## Usage
 
@@ -66,6 +73,8 @@ docker compose logs -f traefik
 ├── docker-compose.yml          # Service definitions and Traefik CLI config
 ├── traefik-config/
 │   └── dynamic.yml             # Routers, services, and middleware definitions
+├── deploy.sh                   # Deploy script: pulls repos, builds images, restarts services
+├── .env                        # Secret credentials (gitignored)
 ├── letsencrypt/                # Auto-generated Let's Encrypt certificates (gitignored)
 └── README.md
 ```
@@ -75,4 +84,5 @@ docker compose logs -f traefik
 - Certificates are automatically provisioned via Let's Encrypt (ACME TLS-ALPN challenge) and stored in `./letsencrypt/acme.json`.
 - The Traefik API dashboard is enabled but not exposed externally.
 - Traefik runs with `no-new-privileges` security restriction.
-- Pre-built images (`pinball2d`, `pinball3d`, `mypage_server`) are pulled from Docker Hub under `gunstein/`.
+- Pre-built images (`pinball2d`, `pinball3d`) are pulled from Docker Hub under `gunstein/`.
+- `blokkflyt_server` connects to a local Bitcoin node via RPC and ZMQ (configured via `.env` and hardcoded host `192.168.0.104`).

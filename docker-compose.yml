@@ -116,3 +116,35 @@ services:
       - "80"
     networks:
       - web
+
+  blokkflyt_web:
+    container_name: blokkflyt_web
+    build:
+      context: ../source/blokkflyt/client
+      dockerfile: Containerfile
+    image: localhost/blokkflyt_web:local
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - web
+
+  blokkflyt_server:
+    container_name: blokkflyt_server
+    build:
+      context: ../source/blokkflyt/server
+      dockerfile: Containerfile
+    image: localhost/blokkflyt_server:local
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      - BITCOIN_RPC_HOST=192.168.0.104
+      - BITCOIN_RPC_USER=${BITCOIN_RPC_USER}
+      - BITCOIN_RPC_PASSWORD=${BITCOIN_RPC_PASSWORD}
+      - BITCOIN_RPC_PORT=8332
+      - ZMQ_BLOCK_PORT=28332
+      - ZMQ_TX_PORT=28333
+      - ALLOWED_ORIGINS=https://blokkflyt.vatnar.no
+    networks:
+      - web

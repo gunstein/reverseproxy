@@ -5,10 +5,12 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="${ROOT_DIR}/../source"
 PINBALL_REPO_DIR="${SOURCE_DIR}/Pinball2DMulti"
 MYPAGE_REPO_DIR="${SOURCE_DIR}/mypage_server"
+BLOKKFLYT_REPO_DIR="${SOURCE_DIR}/blokkflyt"
 PRUNE_CACHE="${1:-}"
 
 PINBALL_REPO_URL="https://github.com/gunstein/Pinball2DMulti"
 MYPAGE_REPO_URL="https://github.com/gunstein/mypage_server"
+BLOKKFLYT_REPO_URL="https://github.com/gunstein/blokkflyt"
 
 if command -v podman-compose >/dev/null 2>&1; then
   COMPOSE_CMD=(podman-compose)
@@ -38,13 +40,20 @@ else
   git clone "${PINBALL_REPO_URL}" "${PINBALL_REPO_DIR}"
 fi
 
+echo "==> Oppdaterer blokkflyt-kildekode"
+if [ -d "${BLOKKFLYT_REPO_DIR}/.git" ]; then
+  git -C "${BLOKKFLYT_REPO_DIR}" pull --ff-only
+else
+  git clone "${BLOKKFLYT_REPO_URL}" "${BLOKKFLYT_REPO_DIR}"
+fi
+
 cd "${ROOT_DIR}"
 
 echo "==> Bygger tjenester"
-"${COMPOSE_CMD[@]}" build mypage_server pinball_web pinball_bevy_web pinball_server
+"${COMPOSE_CMD[@]}" build mypage_server pinball_web pinball_bevy_web pinball_server blokkflyt_web blokkflyt_server
 
 echo "==> Restarter tjenester"
-"${COMPOSE_CMD[@]}" up -d --force-recreate traefik mypage_server pinball_web pinball_bevy_web pinball_server
+"${COMPOSE_CMD[@]}" up -d --force-recreate traefik mypage_server pinball_web pinball_bevy_web pinball_server blokkflyt_web blokkflyt_server
 
 echo "==> Status"
 "${COMPOSE_CMD[@]}" ps

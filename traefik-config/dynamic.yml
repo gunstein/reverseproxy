@@ -64,6 +64,24 @@ http:
         certResolver: myresolver
       middlewares: ["ws-protect-chain"]
 
+    blokkflyt_web_router:
+      rule: "Host(`blokkflyt.vatnar.no`) && !(PathPrefix(`/ws`) || PathPrefix(`/snapshot`) || PathPrefix(`/stats`) || PathPrefix(`/health`))"
+      priority: 10
+      entryPoints: ["websecure"]
+      service: blokkflyt_web_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["default-chain", "blokkflyt-csp"]
+
+    blokkflyt_api_router:
+      rule: "Host(`blokkflyt.vatnar.no`) && (PathPrefix(`/ws`) || PathPrefix(`/snapshot`) || PathPrefix(`/stats`) || PathPrefix(`/health`))"
+      priority: 20
+      entryPoints: ["websecure"]
+      service: blokkflyt_api_service
+      tls:
+        certResolver: myresolver
+      middlewares: ["ws-protect-chain"]
+
   services:
     pinball2d_service:
       loadBalancer:
@@ -94,6 +112,16 @@ http:
       loadBalancer:
         servers:
           - url: "http://pinball_server:9001"
+
+    blokkflyt_web_service:
+      loadBalancer:
+        servers:
+          - url: "http://blokkflyt_web:80"
+
+    blokkflyt_api_service:
+      loadBalancer:
+        servers:
+          - url: "http://blokkflyt_server:8000"
 
   middlewares:
     # (ingen endringer i middlewares)
@@ -138,6 +166,10 @@ http:
     pinball-bevy-csp:
       headers:
         contentSecurityPolicy: "default-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss:; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+
+    blokkflyt-csp:
+      headers:
+        contentSecurityPolicy: "default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss:; img-src 'self' data:; font-src 'self'"
 
     ws-headers:
       headers:
