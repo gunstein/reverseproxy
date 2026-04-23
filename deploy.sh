@@ -53,7 +53,7 @@ echo "==> Bygger tjenester"
 "${COMPOSE_CMD[@]}" build mypage_server pinball_web pinball_bevy_web pinball_server blokkflyt_web blokkflyt_server
 
 echo "==> Restarter tjenester"
-"${COMPOSE_CMD[@]}" up -d --force-recreate traefik mypage_server pinball_web pinball_bevy_web pinball_server blokkflyt_web blokkflyt_server
+"${COMPOSE_CMD[@]}" up -d --force-recreate traefik pinball2d pinball3d mypage_server pinball_web pinball_bevy_web pinball_server blokkflyt_web blokkflyt_server
 
 echo "==> Status"
 "${COMPOSE_CMD[@]}" ps
