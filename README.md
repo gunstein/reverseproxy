@@ -52,6 +52,22 @@ pinball pinball mypage  pinball   pinball       pinball      blokkflyt     blokk
 
 ## Usage
 
+### Deploy (recommended)
+
+`deploy.sh` is the normal way to deploy. It pulls the latest code from all source repos, rebuilds images, and restarts services:
+
+```bash
+./deploy.sh
+```
+
+To also prune unused container images after deploy:
+
+```bash
+./deploy.sh delete_podman_cache
+```
+
+### Manual commands
+
 ```bash
 # Start all services
 docker compose up -d
