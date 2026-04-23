@@ -44,11 +44,12 @@ pinball pinball mypage  pinball   pinball       pinball      blokkflyt     blokk
 - DNS A records for all subdomains pointing to the server
 - Source code at `../source/Pinball2DMulti/` (for `pinball_web`, `pinball_bevy_web`, and `pinball_server` which are built locally)
 - Source code at `../source/blokkflyt/` (for `blokkflyt_web` and `blokkflyt_server` which are built locally)
-- A `.env` file with Bitcoin RPC credentials (see `.env` — not committed to git):
+- A `.env` file in the `reverseproxy/` directory with Bitcoin RPC credentials (not committed to git):
   ```
   BITCOIN_RPC_USER=...
   BITCOIN_RPC_PASSWORD=...
   ```
+  Note: `.env` must be placed in `reverseproxy/`, not in `source/blokkflyt/server/`.
 
 ## Usage
 
