@@ -61,10 +61,22 @@ pinball pinball mypage  pinball   pinball       pinball      blokkflyt     blokk
 ./deploy.sh
 ```
 
-To also prune unused container images after deploy:
+To force a full rebuild (deletes local images before building):
+
+```bash
+./deploy.sh rebuild_all
+```
+
+To prune unused container images after deploy:
 
 ```bash
 ./deploy.sh delete_podman_cache
+```
+
+Flags can be combined in any order:
+
+```bash
+./deploy.sh rebuild_all delete_podman_cache
 ```
 
 ### Manual commands
