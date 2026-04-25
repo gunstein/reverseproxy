@@ -52,8 +52,16 @@ services:
     image: docker.io/gunstein/pinball2d:latest
     container_name: pinball2d
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - web
 
@@ -61,8 +69,16 @@ services:
     image: docker.io/gunstein/pinball3d:latest
     container_name: pinball3d
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - web
 
@@ -73,8 +89,16 @@ services:
     image: localhost/mypage_server:local
     container_name: mypage_server
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - web
 
@@ -86,8 +110,16 @@ services:
       dockerfile: Containerfile
     image: localhost/pinball_web:local
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - web
 
@@ -98,6 +130,8 @@ services:
       dockerfile: server/Containerfile
     image: localhost/pinball_server:local
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "9001"
     environment:
@@ -112,8 +146,16 @@ services:
       dockerfile: client_bevy/Containerfile
     image: localhost/pinball_bevy_web:local
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - web
 
@@ -124,8 +166,16 @@ services:
       dockerfile: Containerfile
     image: localhost/blokkflyt_web:local
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - web
 
@@ -136,6 +186,8 @@ services:
       dockerfile: Containerfile
     image: localhost/blokkflyt_server:local
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "8000"
     environment:
@@ -146,5 +198,11 @@ services:
       - ZMQ_BLOCK_PORT=28332
       - ZMQ_TX_PORT=28333
       - ALLOWED_ORIGINS=https://blokkflyt.vatnar.no
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     networks:
       - web
